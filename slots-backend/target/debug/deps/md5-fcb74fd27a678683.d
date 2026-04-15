@@ -1,0 +1,12 @@
+/home/mattlee/rust-code/slots-backend/target/debug/deps/md5-fcb74fd27a678683.d: /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/lib.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/block_api.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/consts.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/../README.md /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress/soft.rs
+
+/home/mattlee/rust-code/slots-backend/target/debug/deps/libmd5-fcb74fd27a678683.rlib: /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/lib.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/block_api.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/consts.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/../README.md /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress/soft.rs
+
+/home/mattlee/rust-code/slots-backend/target/debug/deps/libmd5-fcb74fd27a678683.rmeta: /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/lib.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/block_api.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/consts.rs /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/../README.md /home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress/soft.rs
+
+/home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/lib.rs:
+/home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/block_api.rs:
+/home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress.rs:
+/home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/consts.rs:
+/home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/../README.md:
+/home/mattlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md-5-0.11.0/src/compress/soft.rs:

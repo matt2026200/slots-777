@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package wallet;
+
+service Wallet {
+    rpc Bet(BetRequest) returns (BetResponse);
+    rpc Win(WinRequest) returns (WinResponse);
+}
+
+message BetRequest {
+    string user_id = 1;
+    string request_id = 2;
+    int64 amount = 3;
+}
+
+message BetResponse {
+    string request_id = 1;
+    int64 balance = 2;
+    int32 code = 3;
+    string msg = 4;
+}
+
+message WinRequest {
+    string user_id = 1;
+    string request_id = 2;
+    int64 amount = 3;
+}
+
+message WinResponse {
+    string request_id = 1;
+    int64 balance = 2;
+    int32 code = 3;
+    string msg = 4;
+}

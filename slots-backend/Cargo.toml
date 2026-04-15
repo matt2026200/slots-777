@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "proto",
+    "common",
+    "gateway",
+    "auth-service",
+    "game-service", 
+    "wallet-service", 
+    "mq2db-service",
+    ]
+[workspace.dependencies]
+prost = "0.14.3"
+tokio =  { version = "1.51.0", features = ["full"] }
+tonic = "0.14.5"
+tonic-prost = "0.14.5"
+serde = { version = "1", features = ["derive"] }
+redis = { version = "1.2.0", features = ["aio", "tokio-comp"] }
+axum = { version = "0.8.8", features = ["ws"] }
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
+serde_json = "1.0.149"
