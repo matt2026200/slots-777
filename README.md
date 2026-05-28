@@ -1,4 +1,6 @@
-效果如视频 ：
+效果如视频：
 
-[Screencast From 2026-05-29 01-44-43.webm](https://github.com/user-attachments/assets/e587a630-ce5e-424d-a27e-6738bf22e7b6)
+[Screencast From 2026-05-29 02-24-11.webm](https://github.com/user-attachments/assets/8492ad84-5f1b-4d43-bd47-0796eff075a6)
+
+
 
