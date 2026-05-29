@@ -1,0 +1,112 @@
+一、 模块划分与职责
+1. 客户端模块（Frontend / App App）
+网络拦截器：拦截所有传出请求与传入响应。在请求头中注入动态 HMAC 签名；在响应中捕获 499 POW_CHALLENGE 状态码。
+
+暗号生命周期管理：在内存（而非 LocalStorage）中维护与 JWT 绑定的、动态轮换的 secret_key。
+
+Web Worker 算力池：后台启动独立线程，不阻塞 UI，专门应对服务端下发的哈希碰撞挑战（PoW）。
+
+2. 认证中心模块（Auth Server）
+密钥签发与轮换：用户登录或 Refresh Token 时，生成 JWT，同时随机生成配对的 access_key 和 secret_key。
+
+分布式同步：将生成的密钥对写入 Redis 集群，并设置与 JWT 相同的过期时间。
+
+3. APISIX 自定义插件模块 (custom-hmac-jwt，优先级 2500)
+凭证提取：从 Header 提取 access_key、X-POW-PUZZLE 和 X-POW-NONCE。
+
+数据路由（Redis）：以 access_key 为索引，从 Redis 动态捞出 secret_key（只读，高并发下可做 Redis 副本集或本地共享内存缓存）。
+
+非对称校验：
+
+常规校验：白嫖官方 HMAC 算法函数。
+
+PoW 校验：执行单次 SHA256 哈希比对。
+
+上下文注入：校验通过则注入 ctx.consumer_name = access_key；PoW 成功则注入 ctx.skip_limit = true。
+
+挑战响应重写：在 body_filter 阶段截获由下游触发的限流响应，重写为 499 并动态下发盐（Salt）。
+
+4. 官方集群限流模块 (limit-req / limit-conn，优先级 1001/1000)
+限流决策：基于漏桶/令牌桶算法。配置 policy = "redis" 统一走独立限流 Redis，以 ctx.consumer_name 实施集群节点间全局高频计次。
+
+二、 核心纵向业务逻辑（四大场景流）
+场景一：绿灯通行（正常合法请求）
+客户端：拼接 Method + URI + Date，用内存中的 secret_key 算好 HMAC 签名，携带 X-HMAC-ACCESS-KEY 正常发包。
+
+APISIX (自定义插件)：
+
+提取 access_key，去 Redis 捞出对应的 secret_key。
+
+验证 HMAC 签名及 Date 防重放窗口成功。
+
+向上下文注入 ctx.consumer_name = access_key。
+
+APISIX (限流插件)：
+
+发现带有 ctx.consumer_name，计次未超标，放行至上游。
+
+场景二：黄灯排队/溢出（用户突发高频，触发限流）
+客户端：由于高频操作，持续发送合法 HMAC 请求。
+
+APISIX (自定义插件)：HMAC 校验全部通过，继续向后传递 ctx.consumer_name。
+
+APISIX (限流插件 limit-req)：
+
+发现请求频率超过了 rate，但在 burst 缓冲池内：强制该请求排队延迟（Delay），匀速放行到上游。
+
+如果瞬间流量直接冲垮了 burst 桶：限流插件直接熔断，向外抛出配置的异常（如状态码 429 或 503）。
+
+APISIX (自定义插件的后置阶段 body_filter)：
+
+捕获到当前状态为限流溢出状态。
+
+拦截该响应，将 HTTP 状态码改写为 499。
+
+动态生成一个随机盐（如 puzzle = access_key:timestamp:random_salt），连同 difficulty = 4 组装成 JSON 返回给前端。
+
+场景三：红灯挑战（客户端解题重构重发）
+客户端 (拦截器捕捉 499)：
+
+拦截器暂停响应向下传递，提取 puzzle 和 difficulty。
+
+将任务塞给后台的 Web Worker。
+
+客户端 (Worker 挖矿计算)：
+
+Worker 开启 while(true) 循环，疯狂递增 nonce 并计算 SHA256(puzzle + nonce)。
+
+直到算出的哈希值前导零个数等于 difficulty，将正确的 nonce 返回给主线程。
+
+客户端 (请求重构)：
+
+拦截器复制刚才造成 499 的那次原始请求配置（error.config）。
+
+在 Header 中追加：X-POW-PUZZLE: puzzle 和 X-POW-NONCE: nonce。
+
+重新将请求发送给 APISIX。
+
+场景四：终局判定（PoW 的服务端校验与防重放）
+重发请求到达 APISIX (自定义插件)：
+
+插件检测到请求头中包含 X-POW-PUZZLE 和 X-POW-NONCE。
+
+防重放检查：
+
+首先以 puzzle 为 Key 去 Redis 中执行 GET。如果能查到已被标记为 used，说明是黑客录制的重放攻击，直接无情返回 403 Forbidden。
+
+非对称验证：
+
+网关本地执行 唯一一次 SHA256(puzzle + nonce)，检查前导零。
+
+验证失败：直接返回 403。若连续失败，联动黑名单封禁该 access_key。
+
+验证成功：
+
+原子性地往 Redis 写入一条 pow:used:[puzzle] = 1（过期时间 60 秒），令该谜题当场失效，彻底封死并发重放空间。
+
+在上下文中注入：ctx.skip_limit_req = true。
+
+APISIX (限流插件 limit-req)：
+
+检测到 ctx.skip_limit_req == true，直接绿灯无条件放行到后端业务服务。
+

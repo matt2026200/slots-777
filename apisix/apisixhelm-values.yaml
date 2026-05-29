@@ -1,0 +1,27 @@
+etcd:
+  persistence:
+    enabled: true
+    size: 512Mi
+    storageClass: nfs-client
+  replicaCount: 1
+ingress-controller:
+  enabled: true
+  apisix:
+    adminService:
+      namespace: apisix
+      name: apisix-admin
+      port: 9180
+  gatewayProxy:
+    createDefault: true
+apisix:
+  admin:
+    allow:
+      ipList:
+      - 127.0.0.1/24
+      - 172.16.0.0/16
+      - 10.0.0.0/8
+    type: LoadBalancer
+
+replicaCount: 1
+service:
+  type: LoadBalancer
